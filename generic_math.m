@@ -1,6 +1,6 @@
 %------------------------------------------------------------------------------%
 % File: generic_math.m
-% Main author: Sebastian Godelet <sebastian.godelet+github@generic_mathail.com>
+% Main author: Sebastian Godelet <sebastian.godelet+github@gmail.com>
 % Created on: Thu Apr 24 18:19:24 WEST 2014
 % vim: ft=mercury ff=unix ts=4 sw=4 et
 %
