@@ -6,7 +6,7 @@ endif
 MCFLAGS=--use-grade-subdirs
 # --debug --stack-segments
 
-.PHONY: all clean install sinstall realclean libgeneric_math test
+.PHONY: all clean install sinstall realclean clean-intern libgeneric_math test
 
 test: test_generic_math
 	./$<	
@@ -19,20 +19,24 @@ test_generic_math: libgeneric_math
 
 all: test
 
-install: libucd
-	$(MMC) $(MCFLAGS) -m libgeneric_math.install
+install: libgeneric_math
+	$(MMC) $(MCFLAGS) -m $<.install
 
-sinstall: libucd
-	sudo $(MMC) $(MCFLAGS) -m libgeneric_math.install
+sinstall: libgeneric_math
+	sudo $(MMC) $(MCFLAGS) -m $<.install
 
-clean:
-	$(MMC) $(MCFLAGS) -m libgeneric_math.clean
-	$(MMC) $(MCFLAGS) -m test_generic_math.clean
-	rm -fR *.mh
+clean-intern:
 	rm -fR *.err
 	rm -fR *.a
 	rm -fR *.so
 	rm -fR *.dylib
 	rm -fR *.dll
 
-realclean: clean
+clean: clean-intern
+	$(MMC) $(MCFLAGS) -m libgeneric_math.clean
+	$(MMC) $(MCFLAGS) -m test_generic_math.clean
+
+realclean: clean-intern
+	$(MMC) $(MCFLAGS) -m libgeneric_math.realclean
+	$(MMC) $(MCFLAGS) -m test_generic_math.realclean
+	rm -fR *.init
