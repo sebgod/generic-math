@@ -1,12 +1,12 @@
 %------------------------------------------------------------------------------%
-% File: test_math.m
+% File: test_generic_math.m
 % Main author: Sebastian Godelet <sebastian.godelet+github@gmail.com>
 % Created on: Fri Apr 25 19:52:07 CEST 2014
 % vim: ft=mercury ff=unix ts=4 sw=4 et
 %
 %------------------------------------------------------------------------------%
 
-:- module test_math.
+:- module test_generic_math.
 
 :- interface.
 

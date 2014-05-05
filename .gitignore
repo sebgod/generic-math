@@ -9,4 +9,5 @@ tags
 *.exe
 *.a
 *.so
+*.jar
 *.dylib
