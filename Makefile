@@ -31,6 +31,7 @@ clean-intern:
 	rm -fR *.so
 	rm -fR *.dylib
 	rm -fR *.dll
+	rm -fR *.beams
 
 clean: clean-intern
 	$(MMC) $(MCFLAGS) -m libgeneric_math.clean
