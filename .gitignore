@@ -1,0 +1,12 @@
+Mercury/
+test_*math
+.*.swp
+tags
+*.mh
+*.err
+*.init
+*.dll
+*.exe
+*.a
+*.so
+*.dylib
