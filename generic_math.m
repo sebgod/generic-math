@@ -66,8 +66,10 @@
 
 :- implementation.
 
-:- use_module math, std_util.
-:- import_module exception, string.
+:- use_module math,
+:- use_module std_util.
+:- import_module exception.
+:- import_module string.
 
 Multiplicand * Multiplier = times(Multiplicand, Multiplier).
 Dividend / Divisor = divide(Dividend, Divisor).
