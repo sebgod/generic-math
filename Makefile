@@ -3,7 +3,7 @@ ifeq ($(OS),Windows_NT)
 else
     MMC=mmc
 endif
-MCFLAGS=--use-grade-subdirs
+MCFLAGS=--use-grade-subdirs -O3
 # --debug --stack-segments
 
 .PHONY: all clean install sinstall realclean clean-intern libgeneric_math test
