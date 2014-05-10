@@ -24,6 +24,21 @@
 :- inst bin_op_func_uo == (func(in, in) = uo is det).
 :- inst bin_op_func_out == (func(in, in) = out is det).
 
+:- typeclass scalar_generic_math(T) <= generic_math(T) where [
+    func times_float `with_type` bin_op_func(T, float),
+    % conversion functions
+    func to_int(T) = int is semidet,
+    func to_integer(T) = bigint is semidet,
+    func to_float(T) = float
+].
+
+:- func det_to_int(T) = int <= scalar_generic_math(T).
+:- func det_to_integer(T) = bigint <= scalar_generic_math(T).
+
+:- instance scalar_generic_math(int).
+:- instance scalar_generic_math(float).
+:- instance scalar_generic_math(bigint).
+
 :- typeclass generic_math(T) where [
     func abs `with_type` unary_op_func(T),
     func min `with_type` bin_op_func(T),
@@ -35,38 +50,23 @@
     func substract `with_type` bin_op_func(T)
 ].
 
-:- typeclass scalar_generic_math(T) <= generic_math(T) where [
-    func times_float `with_type` bin_op_func(T, float),
-    % conversion functions
-    func to_int(T) = int is semidet,
-    func to_integer(T) = bigint is semidet,
-    func to_float(T) = float
-].
-
 :- instance generic_math(int).
 :- instance generic_math(float).
-:- instance generic_math(integer.integer).
+:- instance generic_math(bigint).
 
-:- instance scalar_generic_math(int).
-:- instance scalar_generic_math(float).
-:- instance scalar_generic_math(integer.integer).
-
-:- func T * T = T  <= generic_math(T).
-:- func T / T = T  <= generic_math(T).
+:- func T *  T = T <= generic_math(T).
+:- func T /  T = T <= generic_math(T).
 :- func T // T = T <= generic_math(T).
 :- func T ** T = T <= generic_math(T).
-:- func T + T = T  <= generic_math(T).
-:- func T - T = T  <= generic_math(T).
-
-:- func det_to_int(T) = int <= scalar_generic_math(T).
-:- func det_to_integer(T) = bigint <= scalar_generic_math(T).
+:- func T +  T = T <= generic_math(T).
+:- func T -  T = T <= generic_math(T).
 
 %------------------------------------------------------------------------------%
 %------------------------------------------------------------------------------%
 
 :- implementation.
 
-:- use_module math,
+:- use_module math.
 :- use_module std_util.
 :- import_module exception.
 :- import_module string.
@@ -88,6 +88,24 @@ det_to_integer(Number) = Integer :-
     ;   throw(math.domain_error($pred ++ ": cannot cast to integer"))
     ).
 
+%------------------------------------------------------------------------------%
+% Instances for ints
+%------------------------------------------------------------------------------%
+
+:- instance scalar_generic_math(int) where [
+    func(times_float/2) is int_times_float,
+    func(to_int/1) is std_util.id,
+    func(to_integer/1) is integer.integer,
+    func(to_float/1) is float.float
+].
+
+:- func int_times_float
+    `with_type` bin_op_func(int, float) `with_inst` bin_op_func_uo.
+
+int_times_float(Int, Float) = float.'*'(float.float(Int), Float).
+
+%------------------------------------------------------------------------------%
+
 :- instance generic_math(int) where [
     func(abs/1) is int.abs,
     func(min/2) is int.min,
@@ -99,15 +117,15 @@ det_to_integer(Number) = Integer :-
     func(substract/2) is int.(-)
 ].
 
-:- func int_times_float
-    `with_type` bin_op_func(int, float) `with_inst` bin_op_func_uo.
-int_times_float(Int, Float) = float.'*'(float.float(Int), Float).
+%------------------------------------------------------------------------------%
+% Instances for floats
+%------------------------------------------------------------------------------%
 
-:- instance scalar_generic_math(int) where [
-    func(times_float/2) is int_times_float,
-    func(to_int/1) is std_util.id,
-    func(to_integer/1) is integer.integer,
-    func(to_float/1) is float.float
+:- instance scalar_generic_math(float) where [
+    func(times_float/2) is float.(*),
+    func(to_int/1) is float_to_int,
+    (to_integer(Float) = integer.integer(float_to_int(Float))),
+    func(to_float/1) is std_util.id
 ].
 
 :- func float_to_int(float) = int is semidet.
@@ -117,9 +135,7 @@ float_to_int(Float) = Floor :-
     Ceil = float.ceiling_to_int(Float),
     Floor = Ceil.
 
-:- func float_to_integer(float) = bigint is semidet.
-
-float_to_integer(Float) = integer.integer(float_to_int(Float)).
+%------------------------------------------------------------------------------%
 
 :- instance generic_math(float) where [
     func(abs/1) is float.abs,
@@ -132,24 +148,16 @@ float_to_integer(Float) = integer.integer(float_to_int(Float)).
     func(substract/2) is float.(-)
 ].
 
-:- instance scalar_generic_math(float) where [
-    func(times_float/2) is float.(*),
-    func(to_int/1) is float_to_int,
-    func(to_integer/1) is float_to_integer,
-    func(to_float/1) is std_util.id
+%------------------------------------------------------------------------------%
+% Instances for scaled integers
+%------------------------------------------------------------------------------%
+
+:- instance scalar_generic_math(bigint) where [
+    func(times_float/2) is integer_times_float,
+    func(to_int/1) is integer.int,
+    func(to_integer/1) is std_util.id,
+    func(to_float/1) is integer.float
 ].
-
-:- func integer_min
-    `with_type` bin_op_func(bigint) `with_inst` bin_op_func_out.
-
-integer_min(A, B) = Min :-
-    ( integer.'=<'(A, B) -> Min = A ; Min = B ).
-
-:- func integer_max
-    `with_type` bin_op_func(bigint) `with_inst` bin_op_func_out.
-
-integer_max(A, B) = Max :-
-    ( integer.'>='(A, B) -> Max = A ; Max = B ).
 
 :- func integer_times_float
     `with_type` bin_op_func(bigint, float) `with_inst` bin_op_func_uo.
@@ -167,14 +175,17 @@ integer_times_float(Integer, Float) = float.'*'(integer.float(Integer), Float).
     func(substract/2) is integer.(-)
 ].
 
-:- instance scalar_generic_math(integer.integer) where [
-    func(times_float/2) is integer_times_float,
-    func(to_int/1) is integer.int,
-    func(to_integer/1) is std_util.id,
-    func(to_float/1) is integer.float
-].
+:- func integer_min
+    `with_type` bin_op_func(bigint) `with_inst` bin_op_func_out.
 
-%------------------------------------------------------------------------------%
+integer_min(A, B) = Min :-
+    ( integer.'=<'(A, B) -> Min = A ; Min = B ).
+
+:- func integer_max
+    `with_type` bin_op_func(bigint) `with_inst` bin_op_func_out.
+
+integer_max(A, B) = Max :-
+    ( integer.'>='(A, B) -> Max = A ; Max = B ).
 
 %------------------------------------------------------------------------------%
 :- end_module generic_math.
