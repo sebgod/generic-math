@@ -1,8 +1,9 @@
 %------------------------------------------------------------------------------%
+% vim: ft=mercury ff=unix ts=4 sw=4 et
 % File: generic_math.m
+% Copyright (C) 2014 Sebastian Godelet
 % Main author: Sebastian Godelet <sebastian.godelet+github@gmail.com>
 % Created on: Thu Apr 24 18:19:24 WEST 2014
-% vim: ft=mercury ff=unix ts=4 sw=4 et
 %
 %------------------------------------------------------------------------------%
 
@@ -13,8 +14,10 @@
 :- use_module int.
 :- use_module float.
 :- use_module integer.
+:- use_module rational.
 
 :- type bigint == integer.integer.
+:- type rat    == rational.rational.
 
 :- type unary_op_func(T) == (func(T) = T).
 
@@ -38,6 +41,7 @@
 :- instance scalar_generic_math(int).
 :- instance scalar_generic_math(float).
 :- instance scalar_generic_math(bigint).
+:- instance scalar_generic_math(rat).
 
 :- typeclass generic_math(T) where [
     func abs `with_type` unary_op_func(T),
@@ -53,6 +57,7 @@
 :- instance generic_math(int).
 :- instance generic_math(float).
 :- instance generic_math(bigint).
+:- instance generic_math(rat).
 
 :- func T *  T = T <= generic_math(T).
 :- func T /  T = T <= generic_math(T).
@@ -186,6 +191,45 @@ integer_min(A, B) = Min :-
 
 integer_max(A, B) = Max :-
     ( integer.'>='(A, B) -> Max = A ; Max = B ).
+
+%------------------------------------------------------------------------------%
+% Instances for rationals
+%------------------------------------------------------------------------------%
+:- instance scalar_generic_math(rat) where [
+    (times_float(_R, _F) =
+        throw(math.domain_error($pred ++ ": cannot cast to float"))),
+    (to_int(_R) = throw(math.domain_error($pred ++ ": cannot cast to int"))),
+    (to_integer(_R) =
+        throw(math.domain_error($pred ++ ": cannot cast to integer"))),
+        % XXX As in the rational library itself, this code can overflow
+        % Although it might not need to.
+    (to_float(Rational) =
+        float.'/'(integer.float(rational.numer(Rational)),
+                  integer.float(rational.denom(Rational))))
+].
+
+:- instance generic_math(rat) where [
+    func(abs/1) is rational.abs,
+    func(min/2) is rational_min,
+    func(max/2) is rational_max,
+    func(times/2) is rational.(*),
+    func(divide/2) is rational.(/),
+    (pow(_R, _Exp) = throw(math.domain_error($pred ++ ": not implemented"))),
+    func(add/2) is rational.(+),
+    func(substract/2) is rational.(-)
+].
+
+:- func rational_min
+    `with_type` bin_op_func(rat) `with_inst` bin_op_func_out.
+
+rational_min(A, B) = Min :-
+    ( rational.'=<'(A, B) -> Min = A ; Min = B ).
+
+:- func rational_max
+    `with_type` bin_op_func(rat) `with_inst` bin_op_func_out.
+
+rational_max(A, B) = Max :-
+    ( rational.'>='(A, B) -> Max = A ; Max = B ).
 
 %------------------------------------------------------------------------------%
 :- end_module generic_math.
