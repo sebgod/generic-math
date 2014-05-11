@@ -17,7 +17,6 @@
 :- use_module rational.
 
 :- type bigint == integer.integer.
-:- type rat    == rational.rational.
 
 :- type unary_op_func(T) == (func(T) = T).
 
@@ -32,7 +31,8 @@
     % conversion functions
     func to_int(T) = int is semidet,
     func to_integer(T) = bigint is semidet,
-    func to_float(T) = float
+    func to_float(T) = float,
+    func to_rational(T) = rational.rational
 ].
 
 :- func det_to_int(T) = int <= scalar_generic_math(T).
@@ -41,7 +41,7 @@
 :- instance scalar_generic_math(int).
 :- instance scalar_generic_math(float).
 :- instance scalar_generic_math(bigint).
-:- instance scalar_generic_math(rat).
+:- instance scalar_generic_math(rational.rational).
 
 :- typeclass generic_math(T) where [
     func abs `with_type` unary_op_func(T),
@@ -57,7 +57,7 @@
 :- instance generic_math(int).
 :- instance generic_math(float).
 :- instance generic_math(bigint).
-:- instance generic_math(rat).
+:- instance generic_math(rational.rational).
 
 :- func T *  T = T <= generic_math(T).
 :- func T /  T = T <= generic_math(T).
@@ -101,7 +101,8 @@ det_to_integer(Number) = Integer :-
     func(times_float/2) is int_times_float,
     func(to_int/1) is std_util.id,
     func(to_integer/1) is integer.integer,
-    func(to_float/1) is float.float
+    func(to_float/1) is float.float,
+    func(to_rational/1) is rational.rational
 ].
 
 :- func int_times_float
@@ -130,7 +131,9 @@ int_times_float(Int, Float) = float.'*'(float.float(Int), Float).
     func(times_float/2) is float.(*),
     func(to_int/1) is float_to_int,
     (to_integer(Float) = integer.integer(float_to_int(Float))),
-    func(to_float/1) is std_util.id
+    func(to_float/1) is std_util.id,
+    (to_rational(_F) =
+        throw(math.domain_error($pred ++ ": cannot cast to rational")))
 ].
 
 :- func float_to_int(float) = int is semidet.
@@ -161,7 +164,8 @@ float_to_int(Float) = Floor :-
     func(times_float/2) is integer_times_float,
     func(to_int/1) is integer.int,
     func(to_integer/1) is std_util.id,
-    func(to_float/1) is integer.float
+    func(to_float/1) is integer.float,
+    func(to_rational/1) is rational.from_integer
 ].
 
 :- func integer_times_float
@@ -195,7 +199,7 @@ integer_max(A, B) = Max :-
 %------------------------------------------------------------------------------%
 % Instances for rationals
 %------------------------------------------------------------------------------%
-:- instance scalar_generic_math(rat) where [
+:- instance scalar_generic_math(rational.rational) where [
     (times_float(_R, _F) =
         throw(math.domain_error($pred ++ ": cannot cast to float"))),
     (to_int(_R) = throw(math.domain_error($pred ++ ": cannot cast to int"))),
@@ -205,10 +209,11 @@ integer_max(A, B) = Max :-
         % Although it might not need to.
     (to_float(Rational) =
         float.'/'(integer.float(rational.numer(Rational)),
-                  integer.float(rational.denom(Rational))))
+                  integer.float(rational.denom(Rational)))),
+    (func(to_rational/1)) is std_util.id
 ].
 
-:- instance generic_math(rat) where [
+:- instance generic_math(rational.rational) where [
     func(abs/1) is rational.abs,
     func(min/2) is rational_min,
     func(max/2) is rational_max,
@@ -220,13 +225,13 @@ integer_max(A, B) = Max :-
 ].
 
 :- func rational_min
-    `with_type` bin_op_func(rat) `with_inst` bin_op_func_out.
+    `with_type` bin_op_func(rational.rational) `with_inst` bin_op_func_out.
 
 rational_min(A, B) = Min :-
     ( rational.'=<'(A, B) -> Min = A ; Min = B ).
 
 :- func rational_max
-    `with_type` bin_op_func(rat) `with_inst` bin_op_func_out.
+    `with_type` bin_op_func(rational.rational) `with_inst` bin_op_func_out.
 
 rational_max(A, B) = Max :-
     ( rational.'>='(A, B) -> Max = A ; Max = B ).
