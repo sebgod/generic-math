@@ -187,19 +187,17 @@ integer_times_float(Integer, Float) = float.'*'(integer.float(Integer), Float).
 :- func integer_min
     `with_type` bin_op_func(bigint) `with_inst` bin_op_func_out.
 
-integer_min(A, B) = Min :-
-    ( integer.'=<'(A, B) -> Min = A ; Min = B ).
+integer_min(A, B) = ( integer.'=<'(A, B) -> A ; B ).
 
 :- func integer_max
     `with_type` bin_op_func(bigint) `with_inst` bin_op_func_out.
 
-integer_max(A, B) = Max :-
-    ( integer.'>='(A, B) -> Max = A ; Max = B ).
+integer_max(A, B) = ( integer.'>='(A, B) -> A ; B ).
 
 %------------------------------------------------------------------------------%
 % Instances for rationals
 %------------------------------------------------------------------------------%
-:- instance scalar_generic_math(rational.rational) where [
+:- instance scalar_gene ric_math(rational.rational) where [
     (times_float(_R, _F) =
         throw(math.domain_error($pred ++ ": cannot cast to float"))),
     (to_int(_R) = throw(math.domain_error($pred ++ ": cannot cast to int"))),
@@ -227,14 +225,12 @@ integer_max(A, B) = Max :-
 :- func rational_min
     `with_type` bin_op_func(rational.rational) `with_inst` bin_op_func_out.
 
-rational_min(A, B) = Min :-
-    ( rational.'=<'(A, B) -> Min = A ; Min = B ).
+rational_min(A, B) = ( rational.'=<'(A, B) -> A ; B ).
 
 :- func rational_max
     `with_type` bin_op_func(rational.rational) `with_inst` bin_op_func_out.
 
-rational_max(A, B) = Max :-
-    ( rational.'>='(A, B) -> Max = A ; Max = B ).
+rational_max(A, B) = ( rational.'>='(A, B) -> A ; B ).
 
 %------------------------------------------------------------------------------%
 :- end_module generic_math.
