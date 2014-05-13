@@ -1,11 +1,12 @@
-%------------------------------------------------------------------------------%
+%----------------------------------------------------------------------------%
 % vim: ft=mercury ff=unix ts=4 sw=4 et
+%----------------------------------------------------------------------------%
 % File: generic_math.m
 % Copyright (C) 2014 Sebastian Godelet
 % Main author: Sebastian Godelet <sebastian.godelet+github@gmail.com>
 % Created on: Thu Apr 24 18:19:24 WEST 2014
 %
-%------------------------------------------------------------------------------%
+%----------------------------------------------------------------------------%
 
 :- module generic_math.
 
@@ -66,8 +67,8 @@
 :- func T +  T = T <= generic_math(T).
 :- func T -  T = T <= generic_math(T).
 
-%------------------------------------------------------------------------------%
-%------------------------------------------------------------------------------%
+%----------------------------------------------------------------------------%
+%----------------------------------------------------------------------------%
 
 :- implementation.
 
@@ -93,9 +94,9 @@ det_to_integer(Number) = Integer :-
     ;   throw(math.domain_error($pred ++ ": cannot cast to integer"))
     ).
 
-%------------------------------------------------------------------------------%
+%----------------------------------------------------------------------------%
 % Instances for ints
-%------------------------------------------------------------------------------%
+%----------------------------------------------------------------------------%
 
 :- instance scalar_generic_math(int) where [
     func(times_float/2) is int_times_float,
@@ -110,7 +111,7 @@ det_to_integer(Number) = Integer :-
 
 int_times_float(Int, Float) = float.'*'(float.float(Int), Float).
 
-%------------------------------------------------------------------------------%
+%----------------------------------------------------------------------------%
 
 :- instance generic_math(int) where [
     func(abs/1) is int.abs,
@@ -123,9 +124,9 @@ int_times_float(Int, Float) = float.'*'(float.float(Int), Float).
     func(substract/2) is int.(-)
 ].
 
-%------------------------------------------------------------------------------%
+%----------------------------------------------------------------------------%
 % Instances for floats
-%------------------------------------------------------------------------------%
+%----------------------------------------------------------------------------%
 
 :- instance scalar_generic_math(float) where [
     func(times_float/2) is float.(*),
@@ -143,7 +144,7 @@ float_to_int(Float) = Floor :-
     Ceil = float.ceiling_to_int(Float),
     Floor = Ceil.
 
-%------------------------------------------------------------------------------%
+%----------------------------------------------------------------------------%
 
 :- instance generic_math(float) where [
     func(abs/1) is float.abs,
@@ -156,9 +157,9 @@ float_to_int(Float) = Floor :-
     func(substract/2) is float.(-)
 ].
 
-%------------------------------------------------------------------------------%
+%----------------------------------------------------------------------------%
 % Instances for scaled integers
-%------------------------------------------------------------------------------%
+%----------------------------------------------------------------------------%
 
 :- instance scalar_generic_math(bigint) where [
     func(times_float/2) is integer_times_float,
@@ -171,7 +172,8 @@ float_to_int(Float) = Floor :-
 :- func integer_times_float
     `with_type` bin_op_func(bigint, float) `with_inst` bin_op_func_uo.
 
-integer_times_float(Integer, Float) = float.'*'(integer.float(Integer), Float).
+integer_times_float(Integer, Float) =
+    float.'*'(integer.float(Integer), Float).
 
 :- instance generic_math(bigint) where [
     func(abs/1) is integer.abs,
@@ -194,10 +196,10 @@ integer_min(A, B) = ( integer.'=<'(A, B) -> A ; B ).
 
 integer_max(A, B) = ( integer.'>='(A, B) -> A ; B ).
 
-%------------------------------------------------------------------------------%
+%----------------------------------------------------------------------------%
 % Instances for rationals
-%------------------------------------------------------------------------------%
-:- instance scalar_gene ric_math(rational.rational) where [
+%----------------------------------------------------------------------------%
+:- instance scalar_generic_math(rational.rational) where [
     (times_float(_R, _F) =
         throw(math.domain_error($pred ++ ": cannot cast to float"))),
     (to_int(_R) = throw(math.domain_error($pred ++ ": cannot cast to int"))),
