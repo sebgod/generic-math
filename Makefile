@@ -1,15 +1,11 @@
-ifeq ($(OS),Windows_NT)
-    MMC=mercury_compile
-else
-    MMC=mmc
-endif
+MMC=mmc
 MCFLAGS=--use-grade-subdirs -O3
 # --debug --stack-segments
 
 .PHONY: all clean install sinstall realclean clean-intern libgeneric_math test
 
 test: test_generic_math
-	./$<	
+	./$<
 
 libgeneric_math: generic_math.m
 	$(MMC) $(MCFLAGS) -m $@
