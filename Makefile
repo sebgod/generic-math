@@ -5,7 +5,7 @@ MCFLAGS=--use-grade-subdirs -O3
 .PHONY: all clean install sinstall realclean clean-intern libgeneric_math test
 
 test: test_generic_math
-	./$<
+	./$^
 
 libgeneric_math: generic_math.m
 	$(MMC) $(MCFLAGS) -m $@
