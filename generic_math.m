@@ -141,7 +141,7 @@ int_times_float(Int, Float) = float.'*'(float.float(Int), Float).
 
 float_to_int(Float) = Floor :-
     Floor = float.floor_to_int(Float),
-    Ceil = float.ceiling_to_int(Float),
+    Ceil  = float.ceiling_to_int(Float),
     Floor = Ceil.
 
 %----------------------------------------------------------------------------%
