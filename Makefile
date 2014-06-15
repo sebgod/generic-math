@@ -1,16 +1,18 @@
 MMC=mmc
 SUDO=sudo
 MCFLAGS=--use-grade-subdirs -O3
+CHMOD=chmod
+CHMODFLAGS=644
 # --debug --stack-segments
 
-.PHONY: all clean install sinstall realclean clean-intern libgeneric_math test
+.PHONY: all clean install realclean clean-intern libgeneric_math test
 
 test: test_generic_math
 	@for test_case in $^ ; do \
 		./$$test_case ; \
 	done
 
-libgeneric_math: generic_math.m
+libgeneric_math:
 	$(MMC) $(MCFLAGS) -m $@
 
 test_generic_math: libgeneric_math
@@ -20,12 +22,8 @@ all: test
 
 install: libgeneric_math
 	@for lib in $^ ; do \
-		$(MMC) $(MCFLAGS) -m $$lib.install ; \
-	done
-
-sinstall: libgeneric_math
-	@for lib in $^ ; do \
 		$(SUDO) $(MMC) $(MCFLAGS) -m $$lib.install ; \
+		$(SUDO) $(CHMOD) $(CHMODFLAGS) *.jar ;       \
 	done
 
 clean-intern:
