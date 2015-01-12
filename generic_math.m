@@ -197,7 +197,7 @@ integer_min(A, B) = ( integer.'=<'(A, B) -> A ; B ).
 integer_max(A, B) = ( integer.'>='(A, B) -> A ; B ).
 
 %----------------------------------------------------------------------------%
-% Instances for rationals
+% Instances for rational numbers.
 %----------------------------------------------------------------------------%
 :- instance scalar_generic_math(rational.rational) where [
     (times_float(_R, _F) =
@@ -205,6 +205,7 @@ integer_max(A, B) = ( integer.'>='(A, B) -> A ; B ).
     (to_int(_R) = throw(math.domain_error($pred ++ ": cannot cast to int"))),
     (to_integer(_R) =
         throw(math.domain_error($pred ++ ": cannot cast to integer"))),
+
         % XXX As in the rational library itself, this code can overflow
         % Although it might not need to.
     (to_float(Rational) =
